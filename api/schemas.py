@@ -1,4 +1,4 @@
-from pydantic import BaseModel , Field
+from pydantic import BaseModel , Field, ConfigDict
 
 class PatientInput(BaseModel):
     """
@@ -20,13 +20,15 @@ class PatientInput(BaseModel):
     thal:     int   = Field(..., ge=0,  le=2,    description="0=normal, 1=fixed defect, 2=reversable")
 
     class Config:
-        json_schema_extra = {
+        model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "age": 52, "sex": 1, "cp": 0, "trestbps": 125,
                 "chol": 212, "fbs": 0, "restecg": 1, "thalach": 168,
                 "exang": 0, "oldpeak": 1.0, "slope": 2, "ca": 2, "thal": 2
             }
         }
+    )
 
 
 class PredictionOutput(BaseModel):

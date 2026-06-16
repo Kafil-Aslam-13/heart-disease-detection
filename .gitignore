@@ -11,16 +11,16 @@ venv/
 .ipynb_checkpoints/
 
 # model artifacts and data — too large / sensitive for github
-data/
+
 pipeline/stage_01_data_ingestion/artifacts/
 pipeline/stage_02_data_validation/artifacts/
 pipeline/stage_03_preprocessing/artifacts/
 pipeline/stage_04_model_training/artifacts/
 pipeline/stage_05_evaluation/artifacts/
-
+.github 
 # logs
 logs/
-
+tests
 # os / editor
 .DS_Store
 Thumbs.db
