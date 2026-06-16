@@ -6,3 +6,6 @@ xgboost
 matplotlib 
 seaborn
 shap
+pydantic
+fastapi
+streamlit

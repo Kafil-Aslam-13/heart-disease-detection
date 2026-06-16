@@ -11,6 +11,9 @@ categorical_columns:
   - cp
   - restecg
   - slope
+  - ca
+  - thal
+
 
 numeric_columns:
   - age
@@ -23,8 +26,6 @@ binary_columns:
   - sex
   - fbs
   - exang
-  - ca
-  - thal
 
 target_column: target
 
