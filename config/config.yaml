@@ -1,0 +1,8 @@
+data_ingestion:
+  source_path: data/raw/heart.csv
+  artifact_dir: pipeline/stage_01_data_ingestion/artifacts/raw
+  file_name: heart.csv
+
+logs:
+  log_dir: logs
+  log_file: pipeline.log

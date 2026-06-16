@@ -1,0 +1,22 @@
+logistic_regression:
+  max_iter: 1000
+  C: 1.0
+  random_state: 42
+
+random_forest:
+  n_estimators: 200
+  max_depth: 6
+  min_samples_split: 5
+  min_samples_leaf: 2
+  random_state: 42
+
+xgboost:
+  n_estimators: 200
+  max_depth: 4
+  learning_rate: 0.05
+  subsample: 0.8
+  colsample_bytree: 0.8
+  scale_pos_weight: 1.5   
+  random_state: 42
+
+best_model_metric: roc_auc

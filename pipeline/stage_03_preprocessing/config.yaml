@@ -1,0 +1,35 @@
+invalid_values:
+  ca:
+    invalid: [4]
+    strategy: replace       # 18 rows  → replaced with mode = 0
+  thal:
+    invalid: [3]
+    strategy: replace       # 410 rows → replaced with mode = 2
+
+
+categorical_columns:
+  - cp
+  - restecg
+  - slope
+
+numeric_columns:
+  - age
+  - trestbps
+  - chol
+  - thalach
+  - oldpeak
+
+binary_columns:
+  - sex
+  - fbs
+  - exang
+  - ca
+  - thal
+
+target_column: target
+
+split:
+  train_size: 0.70
+  val_size:   0.15
+  test_size:  0.15
+  random_state: 42
