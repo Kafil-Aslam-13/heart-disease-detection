@@ -62,6 +62,27 @@ def read_and_save(source_path:str,artifact_dir:str,file_name:str,logger:logging.
 def sanity_check(df:pd.DataFrame,stage_config:dict,logger:logging.Logger):
     logging.info("Running sanity check")
     errors=[]
+    
+    expected_cols=stage_config.get("expected_column_names")
+    if expected_cols:
+        missing=set(expected_cols)-set(df.columns)
+
+        if missing:
+            errors.append(f"Missing columns: {missing}")
+    
+    target_col = stage_config["target_column"]
+
+    if target_col in df.columns:
+        
+        unique_classes = sorted(df[target_col].unique())
+
+    if unique_classes != [0, 1]:
+        errors.append(
+            f"Unexpected target values: "
+            f"{unique_classes}"
+        )
+
+
 
     if df.empty:
         errors.append("Dataframe is empty ")
@@ -94,13 +115,13 @@ def sanity_check(df:pd.DataFrame,stage_config:dict,logger:logging.Logger):
 
 # data summary
 
-def log_summary(df: pd.DataFrame, logger: logging.Logger) -> None:
+def log_summary(df: pd.DataFrame,target_col:str, logger: logging.Logger) -> None:
 
     logger.info("--- Data Summary ---")
     logger.info(f"Column types:\n{df.dtypes.to_string()}")
 
     # how many 0s and 1s in the target column
-    logger.info(f"Target counts:\n{df['target'].value_counts().to_string()}")
+    logger.info(f"Target counts:\n{df[target_col].value_counts().to_string()}")
 
 
 def run():
@@ -119,7 +140,7 @@ def run():
         cfg=global_config["data_ingestion"]
         df= read_and_save(cfg["source_path"],cfg["artifact_dir"],cfg["file_name"],logger)
         sanity_check(df,stage_config,logger)
-        log_summary(df,logger)
+        log_summary(df,stage_config["target_column"],logger)
         logger.info("=" * 25)
         logger.info("STAGE 01 — Completed successfully")
         logger.info("=" * 24)

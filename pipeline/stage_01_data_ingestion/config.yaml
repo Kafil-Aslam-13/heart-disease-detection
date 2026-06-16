@@ -1,3 +1,17 @@
-expected_columns: 14
-expected_rows_min: 100
-target_column: target
+expected_columns: 12
+expected_rows_min: 800
+target_column: HeartDisease
+
+expected_column_names:
+  - Age
+  - Sex
+  - ChestPainType
+  - RestingBP
+  - Cholesterol
+  - FastingBS
+  - RestingECG
+  - MaxHR
+  - ExerciseAngina
+  - Oldpeak
+  - ST_Slope
+  - HeartDisease

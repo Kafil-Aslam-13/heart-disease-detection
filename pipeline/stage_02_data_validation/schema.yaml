@@ -1,61 +1,73 @@
+target_column: HeartDisease
 columns:
-  age:
-    dtype: int
-    min: 1
-    max: 120
 
-  sex:
+  Age:
     dtype: int
-    allowed_values: [0, 1]
+    min: 18
+    max: 100
 
-  cp:
+  Sex:
+    dtype: str
+    allowed_values:
+      - M
+      - F
+
+  ChestPainType:
+    dtype: str
+    allowed_values:
+      - TA
+      - ATA
+      - NAP
+      - ASY
+
+  RestingBP:
     dtype: int
-    allowed_values: [0, 1, 2, 3]
+    min: 0
+    max: 250
 
-  trestbps:
+  Cholesterol:
     dtype: int
-    min: 80
-    max: 200
+    min: 0
+    max: 700
 
-  chol:
+  FastingBS:
     dtype: int
-    min: 100
-    max: 600
+    allowed_values:
+      - 0
+      - 1
 
-  fbs:
-    dtype: int
-    allowed_values: [0, 1]
+  RestingECG:
+    dtype: str
+    allowed_values:
+      - Normal
+      - ST
+      - LVH
 
-  restecg:
-    dtype: int
-    allowed_values: [0, 1, 2]
-
-  thalach:
+  MaxHR:
     dtype: int
     min: 60
     max: 220
 
-  exang:
-    dtype: int
-    allowed_values: [0, 1]
+  ExerciseAngina:
+    dtype: str
+    allowed_values:
+      - Y
+      - N
 
-  oldpeak:
+  Oldpeak:
     dtype: float
-    min: 0.0
-    max: 6.2
+    min: -3.0
+    max: 10.0
 
-  slope:
-    dtype: int
-    allowed_values: [0, 1, 2]
+  ST_Slope:
+    dtype: str
+    allowed_values:
+      - Up
+      - Flat
+      - Down
 
-  ca:
+  HeartDisease:
     dtype: int
-    allowed_values: [0, 1, 2, 3]
-
-  thal:
-    dtype: int
-    allowed_values: [0, 1, 2]
-
-  target:
-    dtype: int
-    allowed_values: [0, 1]
+    allowed_values:
+      - 0
+      - 1

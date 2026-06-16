@@ -44,6 +44,13 @@ def check_columns(df:pd.DataFrame,schema:dict,logger:logging.Logger):
     logger.info(f"Expected columns:{expected}")
     logger.info(f"Actual columns{actual}")
 
+    extra_cols = set(actual) - set(expected)
+
+    if extra_cols:
+        logger.warning(
+        f"Unexpected columns: {extra_cols}"
+    )
+
     for col in expected:
         if col in actual:
             logger.info(f"{col} is present ")
@@ -108,11 +115,12 @@ def check_values(df:pd.DataFrame,schema:dict,logger:logging.Logger):
     return errors
 
 # checking if dataset is balanced or not
-def check_class_balance(df: pd.DataFrame, logger: logging.Logger) -> list:
+def check_class_balance(df: pd.DataFrame,schema, logger: logging.Logger) -> list:
     errors = []
-    counts = df["target"].value_counts(normalize=True) * 100
+    target_col=schema["target_column"]
+    counts=(df[target_col].value_counts(normalize=True)*100)
 
-    logger.info(f"Target class balance:")
+    logger.info(f"{target_col} class balance:")
     for label, pct in counts.items():
         logger.info(f"  Class {label} → {pct:.1f}%")
 
@@ -155,7 +163,13 @@ def  run():
 
     try:
         # read artifact from stage 1
-        data_path=global_config["data_ingestion"]["source_path"]
+        artifact_dir = global_config["data_ingestion"]["artifact_dir"]
+        file_name    = global_config["data_ingestion"]["file_name"]
+        data_path=os.path.join(artifact_dir,file_name)
+        if not os.path.exists(data_path):
+                
+           raise FileNotFoundError(f"Stage 1 artifact not found: {data_path}"
+    )
         df=pd.read_csv(data_path)
         logger.info(f"loaded data from stage 1 : {data_path}")
 
@@ -164,7 +178,7 @@ def  run():
         all_errors+=check_columns(df,schema,logger)
         all_errors+=check_missing(df,logger)
         all_errors+=check_values(df,schema,logger)
-        all_errors+=check_class_balance(df,logger)
+        all_errors+=check_class_balance(df,schema,logger)
 
         # save report
         artifact_dir="pipeline/stage_02_data_validation/artifacts"

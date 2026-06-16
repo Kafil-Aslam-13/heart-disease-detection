@@ -1,36 +1,26 @@
-invalid_values:
-  ca:
-    invalid: [4]
-    strategy: replace       # 18 rows  → replaced with mode = 0
-  thal:
-    invalid: [3]
-    strategy: replace       # 410 rows → replaced with mode = 2
-
+invalid_values: {}
 
 categorical_columns:
-  - cp
-  - restecg
-  - slope
-  - ca
-  - thal
-
+  - ChestPainType
+  - RestingECG
+  - ST_Slope
 
 numeric_columns:
-  - age
-  - trestbps
-  - chol
-  - thalach
-  - oldpeak
+  - Age
+  - RestingBP
+  - Cholesterol
+  - MaxHR
+  - Oldpeak
 
 binary_columns:
-  - sex
-  - fbs
-  - exang
+  - Sex
+  - FastingBS
+  - ExerciseAngina
 
-target_column: target
+target_column: HeartDisease
 
 split:
   train_size: 0.70
-  val_size:   0.15
-  test_size:  0.15
+  val_size: 0.15
+  test_size: 0.15
   random_state: 42

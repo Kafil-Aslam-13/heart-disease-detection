@@ -7,6 +7,7 @@ import yaml
 import joblib
 from pathlib import Path
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.preprocessing import OrdinalEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
@@ -137,11 +138,13 @@ def build_preprocessor(numeric_cols:list,categorical_cols:list,binary_cols:list,
 
     categorical_pipeline=Pipeline([
         ("imputer",SimpleImputer(strategy="most_frequent")),
-        ("encoder",OneHotEncoder(handle_unknown="ignore",sparse_output=False,drop="first"))
+        ("encoder",OneHotEncoder(handle_unknown="ignore",sparse_output=False))
     ])
 
     binary_pipeline=Pipeline([
-        ("imputer",SimpleImputer(strategy="most_frequent"))
+        ("imputer",SimpleImputer(strategy="most_frequent")),
+        ("encoder",OneHotEncoder(handle_unknown="ignore", sparse_output=False)
+         )
     ])
 
     preprocessor=ColumnTransformer([
@@ -191,7 +194,7 @@ def save_artifacts(
     
     def _to_df(X:np.ndarray,y:pd.Series):
         df=pd.DataFrame(X,columns=feature_names)
-        df["target"]=y.values
+        df["HeartDisease"]=y.values
         return df
     
     #  save train
@@ -231,8 +234,23 @@ def run():
     logger.info("=" * 50)
  
     try:
-        source_path = global_config["data_ingestion"]["source_path"]
-        df = load_data(source_path, logger)
+        artifact_dir = global_config["data_ingestion"]["artifact_dir"]
+        file_name = global_config["data_ingestion"]["file_name"]
+
+        data_path = os.path.join(
+            artifact_dir,
+            file_name)
+        df = load_data(data_path, logger)
+
+        before = len(df)
+        df = df.drop_duplicates().reset_index(drop=True)
+        logger.info(f"Removed {before - len(df)} duplicate rows")
+        
+        bp_zeros = (df["RestingBP"] == 0).sum()
+
+        df["RestingBP"] = df["RestingBP"].replace(0,np.nan)
+
+        logger.info(f"Converted {bp_zeros} RestingBP=0 values to NaN")
  
         df = clean_invalid_values(
             df,

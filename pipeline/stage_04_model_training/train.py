@@ -44,7 +44,7 @@ def load_config(config_path: str) -> dict:
         return yaml.safe_load(f)
     
 
-def load_data(artifact_dir:str,logger:logging.Logger):
+def load_data(artifact_dir:str,target_col,logger:logging.Logger):
     train_path=os.path.join(artifact_dir,"train.csv")
     val_path=os.path.join(artifact_dir,"val.csv")
 
@@ -56,17 +56,25 @@ def load_data(artifact_dir:str,logger:logging.Logger):
     train_df=pd.read_csv(train_path)
     val_df=pd.read_csv(val_path)
 
-    X_train = train_df.drop("target", axis=1).values
-    y_train = train_df["target"].values
 
-    X_val = val_df.drop("target", axis=1).values
-    y_val = val_df["target"].values
+    X_train = train_df.drop(target_col, axis=1).values
+    y_train = train_df[target_col].values
+
+    X_val = val_df.drop(target_col, axis=1).values
+    y_val = val_df[target_col].values
 
     # X_val=val_df.iloc[:,:-1].values
     # y_val=val_df.iloc[:,-1].values
 
     logger.info(f"Train — X: {X_train.shape}, y: {y_train.shape}")
     logger.info(f"Val   — X: {X_val.shape},   y: {y_val.shape}")
+    logger.info(
+    f"Train Target Distribution: "
+    f"{pd.Series(y_train).value_counts().to_dict()}")
+
+    logger.info(
+    f"Val Target Distribution: "
+    f"{pd.Series(y_val).value_counts().to_dict()}")
 
     return X_train , y_train,X_val,y_val
 
@@ -164,7 +172,7 @@ def pick_best_model(results:dict,metric:str,logger:logging.Logger):
     return best_name
 
 #  save  model
-def save_artifacts(results:dict,best_name:str,artifact_dir:str,logger:logging.Logger):
+def save_artifacts(results:dict,best_name:str,X_train,y_train,X_val,y_val,artifact_dir:str,logger:logging.Logger):
     Path(artifact_dir).mkdir(parents=True,exist_ok=True)
     # save each model
     for name , result in results.items():
@@ -174,7 +182,16 @@ def save_artifacts(results:dict,best_name:str,artifact_dir:str,logger:logging.Lo
 
     #  best model save here 
     best_model=results[best_name]["model"]
+    logger.info("Retraining best model on train + validation date")
+    X_train_full = np.vstack([
+        X_train,X_val
+    ])
+    y_train_full=np.concatenate([
+        y_train,y_val
+    ])
+    best_model.fit(X_train_full,y_train_full)
     best_model_path=os.path.join(artifact_dir,"best_model.joblib")
+
     joblib.dump(best_model,best_model_path)
     logger.info(f"Saved best model ({best_name}) → {best_model_path}")
 
@@ -209,7 +226,9 @@ def run():
     try:
         # step 3 — load data from stage 03
         artifact_dir  = "pipeline/stage_03_preprocessing/artifacts"
-        X_train, y_train, X_val, y_val = load_data(artifact_dir, logger)
+        preprocess_cfg = load_config("pipeline/stage_03_preprocessing/config.yaml")
+        target_col=preprocess_cfg["target_column"]
+        X_train, y_train, X_val, y_val = load_data(artifact_dir,target_col, logger)
 
         # step 4 — build all models
         models = build_models(params, logger)
@@ -230,6 +249,10 @@ def run():
         save_artifacts(
             results,
             best_name,
+            X_train,
+            y_train,
+            X_val,
+            y_val,
             artifact_dir = "pipeline/stage_04_model_training/artifacts",
             logger       = logger
         )

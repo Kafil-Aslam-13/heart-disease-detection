@@ -17,7 +17,7 @@ pipeline/stage_02_data_validation/artifacts/
 pipeline/stage_03_preprocessing/artifacts/
 pipeline/stage_04_model_training/artifacts/
 pipeline/stage_05_evaluation/artifacts/
-.github 
+
 # logs
 logs/
 tests

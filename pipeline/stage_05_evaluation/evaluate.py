@@ -69,8 +69,9 @@ def load_test_data_and_model(
         raise FileNotFoundError(f"best_model.joblib not found: {model_path}")
     
     test_df = pd.read_csv(test_path)
-    X_test  = test_df.iloc[:, :-1].values
-    y_test  = test_df.iloc[:, -1].values
+    TARGET_COL="HeartDisease"
+    X_test  = test_df.drop(TARGET_COL,axis=1).values
+    y_test  = test_df[TARGET_COL].values
 
     model = joblib.load(model_path)
 
@@ -106,7 +107,7 @@ def calculate_metrics(model:object,X_test:np.ndarray,y_test:np.ndarray,logger:lo
     report=classification_report(y_test,y_pred)
     logger.info(f"Classification Report:\n{report}")
 
-    if metrics["recall"] < 0.80:
+    if metrics["recall"] < 0.85:
         logger.warning("Recall below 0.80 . model not predicting too many sick patients . try to adjust threshold")
 
     return metrics , y_pred,y_pred_prob
