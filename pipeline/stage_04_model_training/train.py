@@ -20,6 +20,10 @@ def setup_logger(log_dir: str, log_file: str) -> logging.Logger:
     logger = logging.getLogger("model_training")
     logger.setLevel(logging.INFO)
 
+
+
+    
+
     if not logger.handlers:
         file_handler   = logging.FileHandler(log_path)
         stream_handler = logging.StreamHandler(sys.stdout)
