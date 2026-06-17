@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
@@ -7,9 +7,9 @@ on:
     branches: [main]
 
 jobs:
-  run-pipeline:
-    runs-on: ubuntu-latest
 
+  test:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -27,8 +27,17 @@ jobs:
       - name: Run full pipeline
         run: python run_pipeline.py
 
-      - name: Show training results
-        run: cat pipeline/stage_04_model_training/artifacts/training_results.json
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Show evaluation report
-        run: cat pipeline/stage_05_evaluation/artifacts/evaluation_report.json
+      - name: Sync to Hugging Face Space
+        uses: huggingface/hub-sync@v0.1.0
+        with:
+          github_repo_id: ${{ github.repository }}
+          huggingface_repo_id: KAFIL-ASLAM/heart-disease-api
+          hf_token: ${{ secrets.HF_TOKEN }}
