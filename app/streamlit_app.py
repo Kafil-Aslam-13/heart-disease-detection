@@ -1,7 +1,11 @@
 import streamlit as st
 import requests
-
-API_URL = "http://localhost:8000/predict"
+import os
+API_URL = os.environ.get("API_URL") or "http://localhost:8000/predict"
+try:
+    API_URL = st.secrets.get("API_URL", API_URL)
+except Exception:
+    pass 
 
 st.set_page_config(page_title="Heart Disease Detection", page_icon="❤️")
 st.title("❤️ Heart Disease Risk Prediction")
