@@ -27,6 +27,7 @@ jobs:
       - name: Run full pipeline
         run: python run_pipeline.py
 
+  
   deploy:
     needs: test
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -34,10 +35,28 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Sync to Hugging Face Space
-        uses: huggingface/hub-sync@v0.1.0
         with:
-          github_repo_id: ${{ github.repository }}
-          huggingface_repo_id: KAFIL-ASLAM/heart-disease-api
-          hf_token: ${{ secrets.HF_TOKEN }}
+          fetch-depth: 0
+
+      - name: Push only API-related files to Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+          git clone https://Kafil-Aslam-13:${HF_TOKEN}@huggingface.co/spaces/KAFIL-ASLAM/heart-disease-api hf_space
+
+          # copy only what the API needs — explicitly skip README.md
+          cp -r pipeline hf_space/
+          cp -r config hf_space/
+          cp -r api hf_space/
+          cp -r data hf_space/
+          cp Dockerfile hf_space/
+          cp requirements.txt hf_space/
+          cp run_pipeline.py hf_space/
+
+          cd hf_space
+          git add .
+          git commit -m "auto-deploy from github actions" || echo "nothing to commit"
+          git push
